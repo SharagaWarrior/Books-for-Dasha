@@ -2,95 +2,152 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Книги для Даши</title>
+    <!-- PDF.js library for rendering PDFs reliably on mobile browsers -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height for mobile browsers */
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
+        }
+        header {
+            background-color: #1e293b;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+        }
+        .btn {
+            background-color: #334155;
+            color: #cbd5e1;
+            border: 1px solid #475569;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            max-width: 160px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .btn.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 12px rgba(37, 99, 235, 0.4);
+        }
+        main {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 0;
+            position: relative;
+        }
+        canvas {
+            display: block;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            max-width: 98%;
+            height: auto !important;
+        }
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: #94a3b8;
+        }
+        .fallback-bar {
+            background-color: #1e293b;
+            text-align: center;
+            padding: 6px;
+            font-size: 12px;
+            border-top: 1px solid #334155;
+        }Here is the updated `index.html` optimized for mobile devices. 
+
+It includes a mobile-friendly header layout, touch-friendly buttons, and responsive PDF container wrappers so it displays cleanly on both phones and desktops.
+
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Просмотр документов PDF</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
         body {
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background-color: #f4f4f9;
+            height: 100dvh; /* Uses dynamic viewport height for mobile browsers */
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
         }
         header {
             background-color: #1e293b;
-            color: #fff;
-            padding: 1rem;
+            padding: 0.75rem 1rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            gap: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            z-index: 10;
         }
         .btn {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            padding: 10px 18px;
+            flex: 1;
+            max-width: 200px;
+            background-color: #334155;
+            color: #94a3b8;
+            border: 1px solid #475569;
+            padding: 12px 16px;
             font-size: 15px;
-            border-radius: 6px;
+            font-weight: 500;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
-        .btn:hover {
-            background-color: #2563eb;
+        .btn:active {
+            transform: scale(0.98);
         }
         .btn.active {
-            background-color: #1d4ed8;
-            font-weight: bold;
-            outline: 2px solid #93c5fd;
-        }
-        main {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-        }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
-</head>
-<body>
-
-    <header>
-        <button class="btn active" onclick="showPDF('doc1.pdf', this)">Документ 1</button>
-        <button class="btn" onclick="showPDF('doc2.pdf', this)">Документ 2</button>
-    </header>
-
-    <main>
-        <iframe id="pdfViewer" src="doc1.pdf"></iframe>
-    </main>
-
-    <script>
-        function showPDF(filePath, buttonElement) {
-            // Менять источник файла для iframe
-            document.getElementById('pdfViewer').src = filePath;
-
-            // Обновлять активную кнопку
-            const buttons = document.querySelectorAll('.btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            buttonElement.classList.add('active');
-        }
-    </script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
+            background-color: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 12px rgba(37, 99, 2
